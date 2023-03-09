@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Citys Perú'),
     );
   }
 }
@@ -32,11 +32,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List? _dataList;
+  List _dataList = [];
 
   void _incrementCounter() async {
     final data =
-        await http.get(Uri.parse('https://api.npoint.io/36534790a4058af67ec5'));
+        await http.get(Uri.parse('https://api.npoint.io/5ecaa20ebea4d86084e5'));
     setState(() {
       _dataList = jsonDecode(data.body);
     });
@@ -65,10 +65,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: PageView.builder(
-          itemCount: _dataList?.length,
+          itemCount: _dataList.length,
           itemBuilder: (context, index) {
-            final item = _dataList?[index];
-            final image = item['image'];
+            final item = _dataList[index];
+            final image = item["image"];
             final title = item['name'];
             final description = item['description'];
             //Clase
@@ -93,7 +93,35 @@ class HomeItem extends StatelessWidget {
   final City city;
   @override
   Widget build(BuildContext context) {
-    return Image.network(city.image);
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Card(
+        elevation: 20,
+        clipBehavior: Clip.hardEdge,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Image.network(city.image),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                city.title,
+                textAlign: TextAlign.start,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                city.description,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
