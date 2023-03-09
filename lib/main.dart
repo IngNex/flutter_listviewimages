@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -9,9 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Practice',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.green,
       ),
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -29,11 +32,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List? _dataList;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
+    final data =
+        await http.get(Uri.parse('https://api.npoint.io/36534790a4058af67ec5'));
     setState(() {
-      _counter++;
+      _dataList = jsonDecode(data.body);
     });
   }
 
@@ -41,22 +46,36 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      drawer: Drawer(
+        width: 200,
+        backgroundColor: Colors.redAccent,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
+          children: [
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              "IngNex",
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
+            Divider(),
+            Text("INICIO", style: TextStyle(fontSize: 16, color: Colors.white)),
           ],
+        ),
+      ),
+      body: Center(
+        child: PageView.builder(
+          itemCount: _dataList?.length,
+          itemBuilder: (context, index) {
+            final item = _dataList?[index];
+            final image = item['image'];
+            final title = item['name'];
+            final description = item['description'];
+            //Clase
+            final city =
+                City(image: image, title: title, description: description);
+            return HomeItem(city: city);
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -66,4 +85,21 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class HomeItem extends StatelessWidget {
+  const HomeItem({super.key, required this.city});
+
+  final City city;
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(city.image);
+  }
+}
+
+class City {
+  City({required this.image, required this.title, required this.description});
+  final String image;
+  final String title;
+  final String description;
 }
